@@ -1,0 +1,41 @@
+wget https://archive.apache.org/dist/kafka/3.3.1/kafka_2.12-3.3.1.tgz
+tar -xzf kafka_2.12-3.3.1.tgz
+cd kafka_2.12-3.3.1
+
+java -version
+sudo yum install java-1.8.0-openjdk
+java -version
+
+listeners=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093
+advertised.listeners=INTERNAL://172.31.46.69:9092,EXTERNAL://18.119.13.25:9093
+listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+inter.broker.listener.name=INTERNAL
+zookeeper.connect=localhost:2181
+
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h
+sudo swapon --show
+
+KAFKA_HEAP_OPTS="-Xms256M -Xmx256M" \ bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+
+KAFKA_HEAP_OPTS="-Xms512M -Xmx512M" \ bin/kafka-server-start.sh -daemon config/server.properties
+
+bin/kafka-topics.sh \
+  --create \
+  --topic stock-trades-raw \
+  --bootstrap-server YOUR_PRIVATE_EC2_IP:9092 \
+  --partitions 3 \
+  --replication-factor 1
+
+bin/kafka-console-consumer.sh \
+  --topic stock-trades-raw \
+  --bootstrap-server YOUR_PRIVATE_EC2_IP:9092 \
+  --from-beginning \
+  --property print.key=true \
+  --property print.partition=true \
+  --property print.offset=true \
+  --property key.separator=" | "
