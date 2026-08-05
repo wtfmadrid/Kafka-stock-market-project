@@ -39,3 +39,4 @@ bin/kafka-console-consumer.sh \
   --property print.partition=true \
   --property print.offset=true \
   --property key.separator=" | "
+

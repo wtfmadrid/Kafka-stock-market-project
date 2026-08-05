@@ -1,0 +1,22 @@
+# =========================================================
+# 1. SSH INTO THE SPARK EC2 INSTANCE
+# Run this from your Windows PowerShell
+# =========================================================
+
+ssh -i "YOUR_KEY.pem" ubuntu@YOUR_SPARK_EC2_PUBLIC_IP
+
+source /etc/profile.d/java.sh
+source /etc/profile.d/spark.sh
+
+java -version
+spark-submit --version
+free -h
+
+cd ~/stock-market-streaming/spark
+
+nc -vz YOUR_KAFKA_PRIVATE_IP 9092
+
+spark-submit \
+  --master "local[2]" \
+  --driver-memory 1g \
+  kafka_trade_consumer.py
