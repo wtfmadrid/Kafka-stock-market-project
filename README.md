@@ -254,7 +254,7 @@ hour/
 The original Kafka JSON payload is retained for lineage and troubleshooting.
 
 <!-- IMAGE PLACEHOLDER -->
-![S3 Data Lake Structure](Images/s3_data_lake_structure.png)
+![S3 Data Lake Structure](Images/S3_data.png)
 
 ---
 
@@ -279,9 +279,6 @@ Kafka key / symbol mismatch
 ```
 
 Each quarantined record retains the raw message and a `validation_error` value for investigation or reprocessing.
-
-<!-- IMAGE PLACEHOLDER -->
-![Quarantine Validation](Images/quarantine_validation.png)
 
 ---
 
@@ -502,7 +499,7 @@ basic_financials
 ```
 
 <!-- IMAGE PLACEHOLDER -->
-![AWS Glue Tables](Images/glue_catalog_tables.png)
+![AWS Glue Tables](Images/glue_data_tables.png)
 
 ---
 
@@ -549,7 +546,7 @@ beta
 ```
 
 <!-- IMAGE PLACEHOLDER: use a narrow Athena query screenshot -->
-![Athena Enriched Query](Images/athena_enriched_query.png)
+![Athena Enriched Query](Images/enriched_view.png)
 
 For a readable README screenshot:
 
@@ -572,13 +569,12 @@ ORDER BY window_start DESC, symbol
 LIMIT 20;
 ```
 
-A small CSV export may also be stored at:
+A small CSV export is stored at:
 
 ```text
-sample_outputs/enriched_market_data_sample.csv
+enriched_ohlcv_financials.csv
+latest_quote_enrichment.csv
 ```
-
-This is preferable to trying to fit every Athena column into a single screenshot.
 
 ---
 
@@ -615,7 +611,7 @@ SELECT
     f.net_profit_margin_ttm,
     f.roe_ttm,
     f.beta
-FROM stockmarket_live_db.live_ohlcv_1min g
+FROM stockmarket_live_db.liveohlcv_1min g
 LEFT JOIN stockmarket_live_db.company_profiles p
     ON g.symbol = p.symbol
 LEFT JOIN stockmarket_live_db.basic_financials f
@@ -655,15 +651,14 @@ KAFKA-STOCK-MARKET-PROJECT/
 │   └── rest_quotes_silver_writer.ipynb
 │
 ├── SQL_queries/
-│   ├── query1.sql
-│   ├── query2.sql
-│   └── views_query.sql
+│   ├── enriched_ohlcv_financials.sql
+│   ├── latest_quote_enrichment.sql
+│   └── create_enriched_market_view.sql
 │
 ├── Images/
 │   ├── architecture_diagram.png
 │   ├── s3_data_lake_structure.png
 │   ├── gold_ohlcv_output.png
-│   ├── quarantine_validation.png
 │   ├── glue_catalog_tables.png
 │   └── athena_enriched_query.png
 │
@@ -674,14 +669,6 @@ KAFKA-STOCK-MARKET-PROJECT/
 ├── requirements.txt
 ├── requirements-lock.txt
 └── README.md
-```
-
-Before final publication, consider renaming the SQL files to:
-
-```text
-enriched_ohlcv_financials.sql
-latest_quote_enrichment.sql
-create_enriched_market_view.sql
 ```
 
 ---
@@ -732,24 +719,6 @@ FINNHUB_API_KEY=your_finnhub_api_key
 KAFKA_BOOTSTRAP_SERVERS=your_kafka_public_ip:9093
 KAFKA_TEST_TOPIC=stock-trades-test
 KAFKA_RAW_TRADES_TOPIC=stock-trades-raw
-```
-
-Do **not** commit:
-
-```text
-.env
-*.pem
-.venv/
-```
-
-Recommended `.gitignore` entries:
-
-```gitignore
-.env
-.venv/
-*.pem
-__pycache__/
-.ipynb_checkpoints/
 ```
 
 ---
